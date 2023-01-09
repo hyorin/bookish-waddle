@@ -1,0 +1,29 @@
+- git 개발방법론 중 trunk based commit 방식도 있었음. 협소한 견해로 얘기한 것 같아 반성.
+(https://trunkbaseddevelopment.com)
+- jenkins maven 설정은 사이트 내 [jenkins 관리] 탭에서 configure file 로 추가한 후, 데이터 수정하여 처리
+- maven build 시, release:prepare 는 scm 을 참고하여 snapshot을 태그로 저장까지, release:perform 에서 nexus push 를 결정한다.
+ channel 프로젝트 빌드랑 태그까진 완료했는데 nexus에 해당 버전이 없어서 확인, release:perform 을 추가하여 해결함
+ * 이 부분은 pom.xml 설정 때문인지, maven-plugin 기본 동작의 차이인지 다시 확인
+
+ 확인함. preform 이 필요
+ distributionManagement 값에 deploy 시 배포할 URL을 설정할 수 있음. 우리 프로젝트는 nexus에 deploy 하는 동작이 필요.
+
+ 5.2. release:prepare
+
+Next part of the Release process is Preparing the Release; this will:
+
+perform some checks – there should be no uncommitted changes and the project should depend on no SNAPSHOT dependencies
+change the version of the project in the pom file to a full release number (remove SNAPSHOT suffix) – in our example – 0.1
+run the project test suites
+commit and push the changes
+create the tag out of this non-SNAPSHOT versioned code
+increase the version of the project in the pom – in our example – 0.2-SNAPSHOT
+commit and push the changes
+
+ 5.3. release:perform
+
+The latter part of the Release process is Performing the Release; this will:
+
+checkout release tag from SCM
+build and deploy released code
+This second step of the process relies on the output of the Prepare step – the release.properties.
